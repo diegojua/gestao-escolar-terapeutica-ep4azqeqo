@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PlusCircle, MoreHorizontal } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,12 +24,38 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { MOCK_INVENTORY } from '@/lib/mock-data'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { InventoryItemForm } from '@/components/forms/InventoryItemForm'
+import { inventoryItemSchema } from '@/lib/schemas'
+import { InventoryItem } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Inventory = () => {
-  const [inventory] = useState(MOCK_INVENTORY)
+  const { toast } = useToast()
+  const [inventory, setInventory] = useState<InventoryItem[]>(MOCK_INVENTORY)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddItem = (data: z.infer<typeof inventoryItemSchema>) => {
+    const newItem: InventoryItem = {
+      id: `inv-item-${Date.now()}`,
+      ...data,
+    }
+    setInventory((prev) => [newItem, ...prev])
+    setIsFormOpen(false)
+    toast({
+      title: 'Item Adicionado!',
+      description: `${data.name} foi adicionado ao estoque.`,
+    })
+  }
 
   return (
     <Card>
@@ -40,12 +67,25 @@ const Inventory = () => {
               Gerencie os materiais de apoio e consumo.
             </CardDescription>
           </div>
-          <Button size="sm" className="gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Adicionar Item
-            </span>
-          </Button>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Adicionar Item
+                </span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[625px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Item ao Estoque</DialogTitle>
+              </DialogHeader>
+              <InventoryItemForm
+                onSubmit={handleAddItem}
+                onCancel={() => setIsFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent>
@@ -64,7 +104,9 @@ const Inventory = () => {
           <TableBody>
             {inventory.map((item) => {
               const stockPercentage =
-                (item.quantity / (item.minStock * 2)) * 100
+                item.minStock > 0
+                  ? (item.quantity / (item.minStock * 2)) * 100
+                  : 100
               const isLowStock = item.quantity < item.minStock
 
               return (

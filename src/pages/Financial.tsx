@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { z } from 'zod'
+import { format } from 'date-fns'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,
@@ -23,10 +26,54 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
-import { MOCK_INVOICES, MOCK_PAYMENTS, MOCK_DISCOUNTS } from '@/lib/mock-data'
+import {
+  MOCK_INVOICES,
+  MOCK_PAYMENTS,
+  MOCK_DISCOUNTS,
+  MOCK_CLIENTS,
+  MOCK_STUDENTS,
+} from '@/lib/mock-data'
+import { InvoiceForm } from '@/components/forms/InvoiceForm'
+import { invoiceSchema } from '@/lib/schemas'
+import { Invoice } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Financial = () => {
+  const { toast } = useToast()
+  const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddInvoice = (data: z.infer<typeof invoiceSchema>) => {
+    const client = MOCK_CLIENTS.find((c) => c.id === data.clientId)
+    if (!client) return
+
+    const totalAmount = data.items.reduce((sum, item) => sum + item.amount, 0)
+    const newInvoice: Invoice = {
+      id: `inv-${Date.now()}`,
+      invoiceNumber: `2025-${String(invoices.length + 1).padStart(3, '0')}`,
+      clientId: client.id,
+      clientName: client.fullName,
+      issueDate: format(new Date(), 'yyyy-MM-dd'),
+      dueDate: format(data.dueDate, 'yyyy-MM-dd'),
+      totalAmount,
+      status: 'Pendente',
+    }
+    setInvoices((prev) => [newInvoice, ...prev])
+    setIsFormOpen(false)
+    toast({
+      title: 'Fatura Gerada!',
+      description: `Fatura para ${client.fullName} no valor de ${totalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} foi gerada.`,
+    })
+  }
+
   return (
     <Tabs defaultValue="invoices">
       <TabsList className="grid w-full grid-cols-3">
@@ -44,14 +91,29 @@ const Financial = () => {
                   Gerencie todas as faturas emitidas.
                 </CardDescription>
               </div>
-              <Button size="sm" className="gap-1">
-                <PlusCircle className="h-3.5 w-3.5" />
-                Gerar Nova Fatura
-              </Button>
+              <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-1">
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    Gerar Nova Fatura
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Gerar Nova Fatura</DialogTitle>
+                  </DialogHeader>
+                  <InvoiceForm
+                    clients={MOCK_CLIENTS}
+                    students={MOCK_STUDENTS}
+                    onSubmit={handleAddInvoice}
+                    onCancel={() => setIsFormOpen(false)}
+                  />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardHeader>
           <CardContent>
-            <InvoiceTable />
+            <InvoiceTable invoices={invoices} />
           </CardContent>
         </Card>
       </TabsContent>
@@ -93,7 +155,7 @@ const Financial = () => {
   )
 }
 
-const InvoiceTable = () => (
+const InvoiceTable = ({ invoices }: { invoices: Invoice[] }) => (
   <Table>
     <TableHeader>
       <TableRow>
@@ -108,7 +170,7 @@ const InvoiceTable = () => (
       </TableRow>
     </TableHeader>
     <TableBody>
-      {MOCK_INVOICES.map((invoice) => (
+      {invoices.map((invoice) => (
         <TableRow key={invoice.id}>
           <TableCell>{invoice.invoiceNumber}</TableCell>
           <TableCell>{invoice.clientName}</TableCell>

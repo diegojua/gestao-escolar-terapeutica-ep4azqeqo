@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PlusCircle, MoreHorizontal } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,11 +24,38 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { MOCK_SERVICES } from '@/lib/mock-data'
 import { Badge } from '@/components/ui/badge'
+import { ServiceForm } from '@/components/forms/ServiceForm'
+import { serviceSchema } from '@/lib/schemas'
+import { Service } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Services = () => {
-  const [services] = useState(MOCK_SERVICES)
+  const { toast } = useToast()
+  const [services, setServices] = useState<Service[]>(MOCK_SERVICES)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddService = (data: z.infer<typeof serviceSchema>) => {
+    const newService: Service = {
+      id: `ser-${Date.now()}`,
+      ...data,
+      associatedProfessionals: [], // Default
+    }
+    setServices((prev) => [newService, ...prev])
+    setIsFormOpen(false)
+    toast({
+      title: 'Serviço Adicionado!',
+      description: `${data.name} foi adicionado com sucesso.`,
+    })
+  }
 
   return (
     <Card>
@@ -37,12 +65,25 @@ const Services = () => {
             <CardTitle>Serviços</CardTitle>
             <CardDescription>Gerencie os serviços oferecidos.</CardDescription>
           </div>
-          <Button size="sm" className="gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Adicionar Serviço
-            </span>
-          </Button>
+          <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                  Adicionar Serviço
+                </span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[625px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Serviço</DialogTitle>
+              </DialogHeader>
+              <ServiceForm
+                onSubmit={handleAddService}
+                onCancel={() => setIsFormOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent>

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { PlusCircle, MoreHorizontal, FileDown } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,6 +24,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { MOCK_CLIENTS } from '@/lib/mock-data'
 import { Input } from '@/components/ui/input'
 import {
@@ -33,11 +41,39 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { ClientForm } from '@/components/forms/ClientForm'
+import { clientSchema } from '@/lib/schemas'
+import { Client } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Clients = () => {
-  const [clients] = useState(MOCK_CLIENTS)
+  const { toast } = useToast()
+  const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS)
+  const [isFormOpen, setIsFormOpen] = useState(false)
   const [nameFilter, setNameFilter] = useState('')
   const [cpfFilter, setCpfFilter] = useState('')
+
+  const handleAddClient = (data: z.infer<typeof clientSchema>) => {
+    const newClient: Client = {
+      id: `cli-${Date.now()}`,
+      ...data,
+    }
+    setClients((prev) => [newClient, ...prev])
+    setIsFormOpen(false)
+    toast({
+      title: 'Cliente Adicionado!',
+      description: `${data.fullName} foi adicionado com sucesso.`,
+    })
+  }
+
+  const handleExport = () => {
+    toast({
+      title: 'Exportação Iniciada',
+      description: 'A exportação dos dados dos clientes foi iniciada.',
+    })
+    // In a real app, this would trigger a download.
+    console.log('Exporting clients:', filteredClients)
+  }
 
   const filteredClients = useMemo(() => {
     return clients.filter(
@@ -56,18 +92,36 @@ const Clients = () => {
             <CardDescription>Gerencie os pais ou responsáveis.</CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={handleExport}
+            >
               <FileDown className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Exportar
               </span>
             </Button>
-            <Button size="sm" className="gap-1">
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Adicionar Cliente
-              </span>
-            </Button>
+            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Adicionar Cliente
+                  </span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Novo Cliente</DialogTitle>
+                </DialogHeader>
+                <ClientForm
+                  onSubmit={handleAddClient}
+                  onCancel={() => setIsFormOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
         <div className="flex items-center gap-4 pt-4">

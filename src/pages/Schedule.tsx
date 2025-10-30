@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   format,
   addMonths,
@@ -13,13 +21,59 @@ import {
   endOfWeek,
   isSameMonth,
   isSameDay,
+  setHours,
+  setMinutes,
 } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { cn } from '@/lib/utils'
-import { MOCK_APPOINTMENTS } from '@/lib/mock-data'
+import {
+  MOCK_APPOINTMENTS,
+  MOCK_STUDENTS,
+  MOCK_SERVICES,
+  MOCK_PROFESSIONALS,
+} from '@/lib/mock-data'
+import { AppointmentForm } from '@/components/forms/AppointmentForm'
+import { appointmentSchema } from '@/lib/schemas'
+import { Appointment } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Schedule = () => {
+  const { toast } = useToast()
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [appointments, setAppointments] =
+    useState<Appointment[]>(MOCK_APPOINTMENTS)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddAppointment = (data: z.infer<typeof appointmentSchema>) => {
+    const student = MOCK_STUDENTS.find((s) => s.id === data.studentId)
+    const service = MOCK_SERVICES.find((s) => s.id === data.serviceId)
+    const professional = MOCK_PROFESSIONALS.find(
+      (p) => p.id === data.professionalId,
+    )
+    if (!student || !service || !professional) return
+
+    const [hours, minutes] = data.startTime.split(':').map(Number)
+    const startDate = setMinutes(setHours(data.date, hours), minutes)
+    const endDate = addDays(startDate, service.standardDuration / 60)
+
+    const newAppointment: Appointment = {
+      id: `app-${Date.now()}`,
+      studentId: student.id,
+      studentName: student.fullName,
+      serviceId: service.id,
+      serviceName: service.name,
+      professional: professional.fullName,
+      start: startDate,
+      end: endDate,
+      status: 'Agendado',
+    }
+    setAppointments((prev) => [...prev, newAppointment])
+    setIsFormOpen(false)
+    toast({
+      title: 'Agendamento Criado!',
+      description: `Agendamento para ${student.fullName} criado com sucesso.`,
+    })
+  }
 
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1))
@@ -37,9 +91,25 @@ const Schedule = () => {
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      <Button>
-        <Plus className="mr-2 h-4 w-4" /> Novo Agendamento
-      </Button>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+        <DialogTrigger asChild>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" /> Novo Agendamento
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Novo Agendamento</DialogTitle>
+          </DialogHeader>
+          <AppointmentForm
+            students={MOCK_STUDENTS}
+            services={MOCK_SERVICES}
+            professionals={MOCK_PROFESSIONALS}
+            onSubmit={handleAddAppointment}
+            onCancel={() => setIsFormOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 
@@ -68,13 +138,11 @@ const Schedule = () => {
     const rows = []
     let days = []
     let day = startDate
-    let formattedDate = ''
 
     while (day <= endDate) {
       for (let i = 0; i < 7; i++) {
-        formattedDate = format(day, 'd')
         const cloneDay = day
-        const appointmentsToday = MOCK_APPOINTMENTS.filter((app) =>
+        const appointmentsToday = appointments.filter((app) =>
           isSameDay(app.start, cloneDay),
         )
 
@@ -95,7 +163,7 @@ const Schedule = () => {
                 isSameDay(day, new Date()) && 'text-primary font-bold',
               )}
             >
-              {formattedDate}
+              {format(day, 'd')}
             </span>
             <div className="flex-1 overflow-y-auto text-xs mt-1 space-y-1">
               {appointmentsToday.map((app) => (

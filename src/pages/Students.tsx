@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PlusCircle, MoreHorizontal, FileDown } from 'lucide-react'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -23,7 +24,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MOCK_STUDENTS } from '@/lib/mock-data'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { MOCK_STUDENTS, MOCK_CLIENTS } from '@/lib/mock-data'
 import { Input } from '@/components/ui/input'
 import {
   Pagination,
@@ -33,9 +41,47 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
+import { StudentForm } from '@/components/forms/StudentForm'
+import { studentSchema } from '@/lib/schemas'
+import { Student } from '@/lib/types'
+import { useToast } from '@/components/ui/use-toast'
 
 const Students = () => {
-  const [students] = useState(MOCK_STUDENTS)
+  const { toast } = useToast()
+  const [students, setStudents] = useState<Student[]>(MOCK_STUDENTS)
+  const [clients] = useState(MOCK_CLIENTS)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+
+  const handleAddStudent = (data: z.infer<typeof studentSchema>) => {
+    const responsibleClient = clients.find(
+      (c) => c.id === data.responsibleClientId,
+    )
+    if (!responsibleClient) return
+
+    const newStudent: Student = {
+      id: `stu-${Date.now()}`,
+      fullName: data.fullName,
+      birthDate: data.birthDate,
+      responsibleClientId: data.responsibleClientId,
+      responsibleClientName: responsibleClient.fullName,
+      contractedServices: [],
+      observations: data.observations,
+    }
+    setStudents((prev) => [newStudent, ...prev])
+    setIsFormOpen(false)
+    toast({
+      title: 'Aluno Adicionado!',
+      description: `${data.fullName} foi adicionado com sucesso.`,
+    })
+  }
+
+  const handleExport = () => {
+    toast({
+      title: 'Exportação Iniciada',
+      description: 'A exportação dos dados dos alunos foi iniciada.',
+    })
+    console.log('Exporting students:', students)
+  }
 
   return (
     <Card>
@@ -46,18 +92,37 @@ const Students = () => {
             <CardDescription>Gerencie os alunos e pacientes.</CardDescription>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" className="gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1"
+              onClick={handleExport}
+            >
               <FileDown className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Exportar
               </span>
             </Button>
-            <Button size="sm" className="gap-1">
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Adicionar Aluno
-              </span>
-            </Button>
+            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="gap-1">
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    Adicionar Aluno
+                  </span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px]">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Novo Aluno/Paciente</DialogTitle>
+                </DialogHeader>
+                <StudentForm
+                  clients={clients}
+                  onSubmit={handleAddStudent}
+                  onCancel={() => setIsFormOpen(false)}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
         <div className="flex items-center gap-4 pt-4">
