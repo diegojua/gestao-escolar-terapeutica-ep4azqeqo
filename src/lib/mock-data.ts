@@ -1,0 +1,275 @@
+import {
+  Client,
+  Student,
+  Service,
+  Appointment,
+  Invoice,
+  Payment,
+  DiscountPackage,
+} from '@/lib/types'
+import { subDays, addDays, addHours, format } from 'date-fns'
+
+export const MOCK_CLIENTS: Client[] = [
+  {
+    id: 'cli-1',
+    fullName: 'Ana Silva',
+    cpf: '123.456.789-01',
+    phone: '(11) 98765-4321',
+    email: 'ana.silva@example.com',
+    address: 'Rua das Flores, 123, São Paulo, SP',
+  },
+  {
+    id: 'cli-2',
+    fullName: 'Bruno Costa',
+    cpf: '234.567.890-12',
+    phone: '(21) 91234-5678',
+    email: 'bruno.costa@example.com',
+    address: 'Avenida Copacabana, 456, Rio de Janeiro, RJ',
+  },
+  {
+    id: 'cli-3',
+    fullName: 'Carla Dias',
+    cpf: '345.678.901-23',
+    phone: '(31) 95678-1234',
+    email: 'carla.dias@example.com',
+    address: 'Praça da Liberdade, 789, Belo Horizonte, MG',
+  },
+  {
+    id: 'cli-4',
+    fullName: 'Daniel Martins',
+    cpf: '456.789.012-34',
+    phone: '(41) 98765-4321',
+    email: 'daniel.martins@example.com',
+    address: 'Rua XV de Novembro, 101, Curitiba, PR',
+  },
+  {
+    id: 'cli-5',
+    fullName: 'Eduarda Ferreira',
+    cpf: '567.890.123-45',
+    phone: '(51) 91234-5678',
+    email: 'eduarda.ferreira@example.com',
+    address: 'Avenida Ipiranga, 202, Porto Alegre, RS',
+  },
+]
+
+export const MOCK_SERVICES: Service[] = [
+  {
+    id: 'ser-1',
+    name: 'Aulas de Matemática',
+    description:
+      'Reforço escolar em matemática para ensino fundamental e médio.',
+    standardPrice: 80.0,
+    standardDuration: 60,
+    associatedProfessionals: ['Prof. Carlos', 'Prof. Mariana'],
+  },
+  {
+    id: 'ser-2',
+    name: 'Terapia Ocupacional',
+    description: 'Sessões de terapia ocupacional para crianças e adolescentes.',
+    standardPrice: 150.0,
+    standardDuration: 50,
+    associatedProfessionals: ['Dra. Lúcia', 'Dr. Pedro'],
+  },
+  {
+    id: 'ser-3',
+    name: 'Fonoaudiologia',
+    description: 'Tratamento para distúrbios da fala e linguagem.',
+    standardPrice: 130.0,
+    standardDuration: 45,
+    associatedProfessionals: ['Dra. Sofia'],
+  },
+  {
+    id: 'ser-4',
+    name: 'Aulas de Português',
+    description: 'Aulas de reforço em português e redação.',
+    standardPrice: 75.0,
+    standardDuration: 60,
+    associatedProfessionals: ['Prof. Ricardo'],
+  },
+]
+
+export const MOCK_STUDENTS: Student[] = [
+  {
+    id: 'stu-1',
+    fullName: 'Lucas Silva',
+    birthDate: '2010-05-15',
+    responsibleClientId: 'cli-1',
+    responsibleClientName: 'Ana Silva',
+    contractedServices: ['ser-1', 'ser-4'],
+    nextAppointment: format(addDays(new Date(), 2), 'dd/MM/yyyy'),
+  },
+  {
+    id: 'stu-2',
+    fullName: 'Juliana Costa',
+    birthDate: '2012-09-20',
+    responsibleClientId: 'cli-2',
+    responsibleClientName: 'Bruno Costa',
+    contractedServices: ['ser-2'],
+    nextAppointment: format(addDays(new Date(), 1), 'dd/MM/yyyy'),
+  },
+  {
+    id: 'stu-3',
+    fullName: 'Pedro Dias',
+    birthDate: '2011-02-10',
+    responsibleClientId: 'cli-3',
+    responsibleClientName: 'Carla Dias',
+    contractedServices: ['ser-3'],
+    nextAppointment: format(addDays(new Date(), 3), 'dd/MM/yyyy'),
+  },
+  {
+    id: 'stu-4',
+    fullName: 'Mariana Martins',
+    birthDate: '2013-11-30',
+    responsibleClientId: 'cli-4',
+    responsibleClientName: 'Daniel Martins',
+    contractedServices: ['ser-1'],
+    nextAppointment: format(addDays(new Date(), 5), 'dd/MM/yyyy'),
+  },
+]
+
+const now = new Date()
+export const MOCK_APPOINTMENTS: Appointment[] = [
+  {
+    id: 'app-1',
+    studentId: 'stu-2',
+    studentName: 'Juliana Costa',
+    serviceId: 'ser-2',
+    serviceName: 'Terapia Ocupacional',
+    professional: 'Dra. Lúcia',
+    start: addHours(now, 2),
+    end: addHours(now, 2.83),
+    status: 'Agendado',
+  },
+  {
+    id: 'app-2',
+    studentId: 'stu-1',
+    studentName: 'Lucas Silva',
+    serviceId: 'ser-1',
+    serviceName: 'Aulas de Matemática',
+    professional: 'Prof. Carlos',
+    start: addHours(now, 4),
+    end: addHours(now, 5),
+    status: 'Agendado',
+  },
+  {
+    id: 'app-3',
+    studentId: 'stu-3',
+    studentName: 'Pedro Dias',
+    serviceId: 'ser-3',
+    serviceName: 'Fonoaudiologia',
+    professional: 'Dra. Sofia',
+    start: addDays(now, 1),
+    end: addDays(addHours(now, 0.75), 1),
+    status: 'Agendado',
+  },
+  {
+    id: 'app-4',
+    studentId: 'stu-4',
+    studentName: 'Mariana Martins',
+    serviceId: 'ser-1',
+    serviceName: 'Aulas de Matemática',
+    professional: 'Prof. Mariana',
+    start: addDays(now, 2),
+    end: addDays(addHours(now, 1), 2),
+    status: 'Agendado',
+  },
+  {
+    id: 'app-5',
+    studentId: 'stu-1',
+    studentName: 'Lucas Silva',
+    serviceId: 'ser-4',
+    serviceName: 'Aulas de Português',
+    professional: 'Prof. Ricardo',
+    start: subDays(now, 1),
+    end: subDays(addHours(now, 1), 1),
+    status: 'Concluído',
+  },
+]
+
+export const MOCK_INVOICES: Invoice[] = [
+  {
+    id: 'inv-1',
+    invoiceNumber: '2024-001',
+    clientId: 'cli-1',
+    clientName: 'Ana Silva',
+    studentName: 'Lucas Silva',
+    issueDate: '2024-06-01',
+    dueDate: '2024-06-10',
+    totalAmount: 310.0,
+    status: 'Paga',
+  },
+  {
+    id: 'inv-2',
+    invoiceNumber: '2024-002',
+    clientId: 'cli-2',
+    clientName: 'Bruno Costa',
+    studentName: 'Juliana Costa',
+    issueDate: '2024-06-05',
+    dueDate: '2024-06-15',
+    totalAmount: 600.0,
+    status: 'Pendente',
+  },
+  {
+    id: 'inv-3',
+    invoiceNumber: '2024-003',
+    clientId: 'cli-3',
+    clientName: 'Carla Dias',
+    studentName: 'Pedro Dias',
+    issueDate: '2024-05-20',
+    dueDate: '2024-05-30',
+    totalAmount: 520.0,
+    status: 'Atrasada',
+  },
+  {
+    id: 'inv-4',
+    invoiceNumber: '2024-004',
+    clientId: 'cli-4',
+    clientName: 'Daniel Martins',
+    studentName: 'Mariana Martins',
+    issueDate: '2024-06-10',
+    dueDate: '2024-06-20',
+    totalAmount: 320.0,
+    status: 'Pendente',
+  },
+]
+
+export const MOCK_PAYMENTS: Payment[] = [
+  {
+    id: 'pay-1',
+    invoiceId: 'inv-1',
+    clientId: 'cli-1',
+    clientName: 'Ana Silva',
+    paymentDate: '2024-06-08',
+    amountPaid: 310.0,
+    paymentMethod: 'Pix',
+  },
+]
+
+export const MOCK_DISCOUNTS: DiscountPackage[] = [
+  {
+    id: 'dis-1',
+    name: 'Desconto Irmãos',
+    type: 'Desconto Percentual',
+    value: 10,
+    applicableServices: ['ser-1', 'ser-2', 'ser-3', 'ser-4'],
+    conditions: 'Aplicável para 2 ou mais irmãos matriculados.',
+  },
+  {
+    id: 'dis-2',
+    name: 'Pacote Terapia Completa',
+    type: 'Pacote de Serviços',
+    value: 500,
+    applicableServices: ['ser-2', 'ser-3'],
+    conditions: 'Pacote mensal com 4 sessões de T.O. e 4 de Fono.',
+  },
+]
+
+export const MOCK_CASH_FLOW = [
+  { date: '01/06', revenue: 4000, expenses: 2400 },
+  { date: '02/06', revenue: 3000, expenses: 1398 },
+  { date: '03/06', revenue: 2000, expenses: 9800 },
+  { date: '04/06', revenue: 2780, expenses: 3908 },
+  { date: '05/06', revenue: 1890, expenses: 4800 },
+  { date: '06/06', revenue: 2390, expenses: 3800 },
+  { date: '07/06', revenue: 3490, expenses: 4300 },
+]
