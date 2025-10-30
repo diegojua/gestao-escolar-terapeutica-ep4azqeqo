@@ -12,7 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   School,
-  Sitemap,
+  Workflow,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -31,7 +31,7 @@ const navItems = [
   { href: '/agenda', label: 'Agenda', icon: Calendar },
   { href: '/financeiro', label: 'Financeiro', icon: DollarSign },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart },
-  { href: '/dependencias', label: 'Dependências', icon: Sitemap },
+  { href: '/dependencias', label: 'Dependências', icon: Workflow },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },
 ]
 
