@@ -13,6 +13,8 @@ import {
   ChevronRight,
   School,
   Workflow,
+  ClipboardUser,
+  Package,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -27,9 +29,11 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/clientes', label: 'Clientes', icon: Users },
   { href: '/alunos', label: 'Alunos/Pacientes', icon: HeartHandshake },
+  { href: '/profissionais', label: 'Profissionais', icon: ClipboardUser },
   { href: '/servicos', label: 'Serviços', icon: Briefcase },
   { href: '/agenda', label: 'Agenda', icon: Calendar },
   { href: '/financeiro', label: 'Financeiro', icon: DollarSign },
+  { href: '/estoque', label: 'Estoque', icon: Package },
   { href: '/relatorios', label: 'Relatórios', icon: BarChart },
   { href: '/dependencias', label: 'Dependências', icon: Workflow },
   { href: '/configuracoes', label: 'Configurações', icon: Settings },

@@ -28,12 +28,16 @@ const getPageTitle = (pathname: string) => {
       return 'Clientes'
     case '/alunos':
       return 'Alunos/Pacientes'
+    case '/profissionais':
+      return 'Profissionais'
     case '/servicos':
       return 'Serviços'
     case '/agenda':
       return 'Agenda'
     case '/financeiro':
       return 'Financeiro'
+    case '/estoque':
+      return 'Estoque'
     case '/relatorios':
       return 'Relatórios'
     case '/dependencias':

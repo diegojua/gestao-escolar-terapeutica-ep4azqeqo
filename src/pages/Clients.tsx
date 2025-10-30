@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { PlusCircle, MoreHorizontal, FileDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -36,6 +36,16 @@ import {
 
 const Clients = () => {
   const [clients] = useState(MOCK_CLIENTS)
+  const [nameFilter, setNameFilter] = useState('')
+  const [cpfFilter, setCpfFilter] = useState('')
+
+  const filteredClients = useMemo(() => {
+    return clients.filter(
+      (client) =>
+        client.fullName.toLowerCase().includes(nameFilter.toLowerCase()) &&
+        client.cpf.includes(cpfFilter),
+    )
+  }, [clients, nameFilter, cpfFilter])
 
   return (
     <Card>
@@ -61,8 +71,18 @@ const Clients = () => {
           </div>
         </div>
         <div className="flex items-center gap-4 pt-4">
-          <Input placeholder="Filtrar por nome..." className="max-w-sm" />
-          <Input placeholder="Filtrar por CPF..." className="max-w-sm" />
+          <Input
+            placeholder="Filtrar por nome..."
+            className="max-w-sm"
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+          />
+          <Input
+            placeholder="Filtrar por CPF..."
+            className="max-w-sm"
+            value={cpfFilter}
+            onChange={(e) => setCpfFilter(e.target.value)}
+          />
         </div>
       </CardHeader>
       <CardContent>
@@ -79,7 +99,7 @@ const Clients = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {clients.map((client) => (
+            {filteredClients.map((client) => (
               <TableRow key={client.id}>
                 <TableCell className="font-medium">{client.fullName}</TableCell>
                 <TableCell>{client.cpf}</TableCell>

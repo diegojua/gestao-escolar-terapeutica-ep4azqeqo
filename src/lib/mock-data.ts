@@ -8,6 +8,8 @@ import {
   DiscountPackage,
   Notification,
   Dependency,
+  Professional,
+  InventoryItem,
 } from '@/lib/types'
 import { subDays, addDays, addHours, format, sub } from 'date-fns'
 
@@ -311,6 +313,66 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     message: 'Nova funcionalidade de relatórios foi adicionada.',
     timestamp: sub(new Date(), { days: 7 }),
     read: true,
+  },
+]
+
+export const MOCK_PROFESSIONALS: Professional[] = [
+  {
+    id: 'prof-1',
+    fullName: 'Prof. Carlos Andrade',
+    specialty: 'Matemática',
+    phone: '(11) 99999-1111',
+    email: 'carlos.andrade@example.com',
+    availability: [
+      { day: 'Segunda-feira', start: '08:00', end: '12:00' },
+      { day: 'Quarta-feira', start: '14:00', end: '18:00' },
+    ],
+  },
+  {
+    id: 'prof-2',
+    fullName: 'Dra. Lúcia Gomes',
+    specialty: 'Terapia Ocupacional',
+    phone: '(11) 99999-2222',
+    email: 'lucia.gomes@example.com',
+    availability: [
+      { day: 'Terça-feira', start: '09:00', end: '17:00' },
+      { day: 'Quinta-feira', start: '09:00', end: '17:00' },
+    ],
+  },
+  {
+    id: 'prof-3',
+    fullName: 'Dra. Sofia Bernardes',
+    specialty: 'Fonoaudiologia',
+    phone: '(11) 99999-3333',
+    email: 'sofia.bernardes@example.com',
+    availability: [{ day: 'Sexta-feira', start: '10:00', end: '19:00' }],
+  },
+]
+
+export const MOCK_INVENTORY: InventoryItem[] = [
+  {
+    id: 'inv-item-1',
+    name: 'Caderno Brochura',
+    description: 'Caderno de 96 folhas para anotações.',
+    quantity: 50,
+    minStock: 20,
+    supplier: 'Papelaria Central',
+  },
+  {
+    id: 'inv-item-2',
+    name: 'Lápis Preto nº2',
+    description: 'Caixa com 144 unidades.',
+    quantity: 10,
+    minStock: 15,
+    supplier: 'Fornecedor Escolar',
+  },
+  {
+    id: 'inv-item-3',
+    name: 'Massa de Modelar',
+    description: 'Kit com 12 cores, atóxica.',
+    quantity: 30,
+    minStock: 10,
+    supplier: 'Brinquedos Educativos S.A.',
   },
 ]
 

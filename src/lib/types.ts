@@ -29,6 +29,24 @@ export type Service = {
   associatedProfessionals: string[]
 }
 
+export type Professional = {
+  id: string
+  fullName: string
+  specialty: string
+  phone: string
+  email: string
+  availability: { day: string; start: string; end: string }[]
+}
+
+export type InventoryItem = {
+  id: string
+  name: string
+  description: string
+  quantity: number
+  minStock: number
+  supplier: string
+}
+
 export type Appointment = {
   id: string
   studentId: string

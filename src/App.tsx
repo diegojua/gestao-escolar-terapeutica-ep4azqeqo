@@ -14,6 +14,8 @@ import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import { NotificationProvider } from './stores/use-notification-store'
 import Dependencies from './pages/Dependencies'
+import Professionals from './pages/Professionals'
+import Inventory from './pages/Inventory'
 
 const App = () => (
   <BrowserRouter>
@@ -26,9 +28,11 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/clientes" element={<Clients />} />
             <Route path="/alunos" element={<Students />} />
+            <Route path="/profissionais" element={<Professionals />} />
             <Route path="/servicos" element={<Services />} />
             <Route path="/agenda" element={<Schedule />} />
             <Route path="/financeiro" element={<Financial />} />
+            <Route path="/estoque" element={<Inventory />} />
             <Route path="/relatorios" element={<Reports />} />
             <Route path="/dependencias" element={<Dependencies />} />
             <Route path="/configuracoes" element={<Settings />} />
