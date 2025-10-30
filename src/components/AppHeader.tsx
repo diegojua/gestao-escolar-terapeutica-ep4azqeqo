@@ -36,6 +36,8 @@ const getPageTitle = (pathname: string) => {
       return 'Financeiro'
     case '/relatorios':
       return 'Relatórios'
+    case '/dependencias':
+      return 'Dependências'
     case '/configuracoes':
       return 'Configurações'
     default:

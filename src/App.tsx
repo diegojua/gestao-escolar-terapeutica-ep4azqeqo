@@ -13,6 +13,7 @@ import Financial from './pages/Financial'
 import Reports from './pages/Reports'
 import Settings from './pages/Settings'
 import { NotificationProvider } from './stores/use-notification-store'
+import Dependencies from './pages/Dependencies'
 
 const App = () => (
   <BrowserRouter>
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/agenda" element={<Schedule />} />
             <Route path="/financeiro" element={<Financial />} />
             <Route path="/relatorios" element={<Reports />} />
+            <Route path="/dependencias" element={<Dependencies />} />
             <Route path="/configuracoes" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />

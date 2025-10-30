@@ -83,3 +83,11 @@ export type Notification = {
   read: boolean
   link?: string
 }
+
+export type Dependency = {
+  id: number
+  name: string
+  type: string
+  description: string
+  sla: string
+}
