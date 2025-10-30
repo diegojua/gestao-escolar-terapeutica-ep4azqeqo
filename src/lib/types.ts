@@ -73,3 +73,13 @@ export type DiscountPackage = {
   applicableServices: string[]
   conditions: string
 }
+
+export type Notification = {
+  id: string
+  type: 'invoice' | 'appointment' | 'system'
+  title: string
+  message: string
+  timestamp: Date
+  read: boolean
+  link?: string
+}

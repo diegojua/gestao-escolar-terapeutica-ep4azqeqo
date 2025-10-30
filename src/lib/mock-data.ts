@@ -6,8 +6,9 @@ import {
   Invoice,
   Payment,
   DiscountPackage,
+  Notification,
 } from '@/lib/types'
-import { subDays, addDays, addHours, format } from 'date-fns'
+import { subDays, addDays, addHours, format, sub } from 'date-fns'
 
 export const MOCK_CLIENTS: Client[] = [
   {
@@ -272,4 +273,42 @@ export const MOCK_CASH_FLOW = [
   { date: '05/06', revenue: 1890, expenses: 4800 },
   { date: '06/06', revenue: 2390, expenses: 3800 },
   { date: '07/06', revenue: 3490, expenses: 4300 },
+]
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'notif-1',
+    type: 'invoice',
+    title: 'Fatura Vencendo',
+    message: 'A fatura #2024-002 para Bruno Costa vence em 3 dias.',
+    timestamp: sub(new Date(), { days: 1 }),
+    read: false,
+    link: '/financeiro',
+  },
+  {
+    id: 'notif-2',
+    type: 'appointment',
+    title: 'Agendamento Próximo',
+    message: 'Sessão de Terapia Ocupacional com Juliana Costa em 1 hora.',
+    timestamp: sub(new Date(), { hours: 2 }),
+    read: false,
+    link: '/agenda',
+  },
+  {
+    id: 'notif-3',
+    type: 'invoice',
+    title: 'Fatura Atrasada',
+    message: 'A fatura #2024-003 para Carla Dias está atrasada.',
+    timestamp: sub(new Date(), { days: 5 }),
+    read: true,
+    link: '/financeiro',
+  },
+  {
+    id: 'notif-4',
+    type: 'system',
+    title: 'Atualização do Sistema',
+    message: 'Nova funcionalidade de relatórios foi adicionada.',
+    timestamp: sub(new Date(), { days: 7 }),
+    read: true,
+  },
 ]
